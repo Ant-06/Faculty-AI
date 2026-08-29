@@ -211,7 +211,7 @@ export default function Landing() {
       </section>
 
       <footer className="max-w-6xl mx-auto px-4 sm:px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-400">
-        <span>© {new Date().getFullYear()} FacultyAI Hub.</span>
+        <span>© {new Date().getFullYear()} FacultyAI Hub. A Design Thinking prototype</span>
         <Link to="/admin-login" className="hover:text-slate-600">Admin Login</Link>
       </footer>
     </div>
