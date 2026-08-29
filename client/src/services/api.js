@@ -1,30 +1,50 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("fah_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("fah_token");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response?.status === 401) {
       localStorage.removeItem("fah_token");
       localStorage.removeItem("fah_user");
-      if (!window.location.pathname.startsWith("/login") && !window.location.pathname.startsWith("/admin-login")) {
+
+      const path = window.location.pathname;
+
+      if (
+        !path.startsWith("/login") &&
+        !path.startsWith("/admin-login")
+      ) {
         window.location.href = "/login";
       }
     }
-    return Promise.reject(err);
+
+    return Promise.reject(error);
   }
 );
 
