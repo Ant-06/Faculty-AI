@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  passwordHash  String
+  role          String   @default("FACULTY")
+  createdAt     DateTime @default(now())
+
+  profile          FacultyProfile?
+  savedTools       SavedTool[]
+  learningProgress LearningProgress[]
+  announcements    Announcement[] @relation("AnnouncementAuthor")
+}
+
+model FacultyProfile {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department          String   @default("AI & Data Science Engineering")
+  title               String   @default("Assistant Professor")
+  primaryInterest     String   @default("TEACHING")
+  weeklyTimeMinutes   Int      @default(30)
+  skillLevel          String   @default("BEGINNER")
+  onboardingComplete  Boolean  @default(false)
+  streakDays          Int      @default(0)
+  totalLearningMins   Int      @default(0)
+  timeSavedHoursMonth Float    @default(0)
+  createdAt           DateTime @default(now())
+}
+
+model Tool {
+  id               String   @id @default(cuid())
+  name             String
+  icon             String   @default("Sparkles")
+  description      String
+  category         String
+  pricing          String
+  difficulty       String
+  bestUseCase      String
+  facultyRelevance String
+  learningTimeMins Int      @default(15)
+  website          String   @default("#")
+  popularityScore  Int      @default(50)
+  institutional    Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  savedBy SavedTool[]
+}
+
+model LearningModule {
+  id                String   @id @default(cuid())
+  title             String
+  description       String
+  category          String
+  durationMins      Int
+  difficulty        String
+  learningObjective String
+  content           String
+  examples          String
+  facultyExamples   String
+  quizQuestion      String
+  quizOptions       String
+  quizAnswerIndex   Int      @default(0)
+  samplePrompt      String   @default("")
+  published         Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  progress LearningProgress[]
+}
+
+model LearningProgress {
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moduleId    String
+  module      LearningModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  completed   Boolean        @default(false)
+  completedAt DateTime?
+  startedAt   DateTime       @default(now())
+
+  @@unique([userId, moduleId])
+}
+
+model SavedTool {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  toolId  String
+  tool    Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  savedAt DateTime @default(now())
+
+  @@unique([userId, toolId])
+}
+
+model AIUpdate {
+  id             String   @id @default(cuid())
+  title          String
+  category       String
+  summary        String
+  whyItMatters   String
+  readTimeMins   Int      @default(3)
+  relevanceScore Int      @default(80)
+  section        String   @default("New This Week")
+  createdAt      DateTime @default(now())
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  authorId  String?
+  author    User?    @relation("AnnouncementAuthor", fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+}
