@@ -122,17 +122,6 @@ export default function Login() {
 
           </form>
 
-          <p className="text-xs text-slate-500 mt-5 text-center">
-            Demo credentials:{" "}
-            <span className="font-mono">
-              faculty@demo.com
-            </span>{" "}
-            /{" "}
-            <span className="font-mono">
-              Faculty@123
-            </span>
-          </p>
-
         </div>
 
         <p className="text-sm text-slate-500 text-center mt-6">
